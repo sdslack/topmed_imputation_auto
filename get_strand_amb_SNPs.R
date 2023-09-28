@@ -13,7 +13,7 @@ get_strand_amb_SNPs <- function(bim_file) {
                    ((bim$V5 == "T") & (bim$V6 == "A")) |
                    ((bim$V5 == "C") & (bim$V6 == "G")) |
                    ((bim$V5 == "G") & (bim$V6 == "C"))]
-  path <- dirname(temp_gwas_bim)
+  path <- dirname(bim_file)
   write.table(x = snps, file = paste0(path, "/tmp_strand_remove_snps.txt"),
               sep="\t", quote=F, row.names=F, col.names=F)
 }
