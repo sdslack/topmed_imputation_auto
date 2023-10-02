@@ -1,27 +1,39 @@
-# Edited Script sent by Meher
+#!/usr/bin/env Rscript
 
-
-# Read in tool inputs
-source("cwl_inputs.R")
-
+# To note: This script was modified from the "New Info Files Filter" tool on
+# Seven Bridges, which was edited by Erika and Randi from a script by Meher.
 
 args <- commandArgs(trailingOnly = TRUE)
+info_file <- args[1]
+rsq <- args[2]
+maf <- args[3]
 
-# The directory where the files will go
-snp.out.file <- paste0(file_name, "_maf",maf, "_rsq", rsq, "_snps.txt")
-info.out.file <- paste0("clean_", file_name )
+print("First trailing arg should be input INFO file, second should be Rsq")
+print("filter, third should be MAF filter.")
+print("Assumes INFO file has columns 'Rsq', 'MAF', & 'Genotyped'.")
 
+info_file_name <- basename(info_file)
+info_file_dir <- dirname(info_file)
 
+snp_out_file <- paste0(info_file_dir, "/", info_file_name,
+                       "_maf", maf, "_rsq", rsq, "_snps.txt")
+info_out_file <- paste0(info_file_dir, "/clean_", info_file_name)
 
-info <- read.delim(gzfile(info.file), stringsAsFactors=F)
+info <- read.delim(gzfile(info_file), stringsAsFactors=F)
 
 info$Rsq_num <- as.numeric(info$Rsq)
-info_clean <- info[which(((info$Genotyped == "Typed_Only") | (!is.na(info$Rsq_num) & (info$Rsq_num >= rsq)) ) & (info$MAF >= maf)),]
-extracted.rows <- ((info$Genotyped == "Typed_Only") | (!is.na(info$Rsq_num) & (info$Rsq_num >= rsq)) ) & (info$MAF >= maf )
-snps <- info$SNP[extracted.rows]
-
+# Select rows from info that are either genotyped or above the Rsq threshold
+# and also are above the MAF threshold
+info_clean <- info[
+  which(((info$Genotyped == "Typed_Only") |
+           (!is.na(info$Rsq_num) & (info$Rsq_num >= rsq)))
+        & (info$MAF >= maf)),]
+extracted_rows <- (
+  (info$Genotyped == "Typed_Only") |
+    (!is.na(info$Rsq_num) & (info$Rsq_num >= rsq))) &
+  (info$MAF >= maf)
+snps <- info$SNP[extracted_rows]
 
 # Write out cleaned files
-write.table(info_clean, info.out.file, sep="\t", quote=F, row.names=F)
-write.table(snps, snp.out.file,  sep="\t", quote=F, row.names=F, col.names=F)
-
+write.table(info_clean, info_out_file, sep="\t", quote=F, row.names=F)
+write.table(snps, snp_out_file,  sep="\t", quote=F, row.names=F, col.names=F)
