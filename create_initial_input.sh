@@ -7,6 +7,7 @@ then
    echo "Script removes SNPs with duplicate positions, removes"
    echo "strand ambiguous SNPs, and performs pre-imputation QC."
    echo "Current script runs PLINK1.9 with --keep-allele-order."
+   echo "Crossover is from hg19 to hg38."
    exit
 fi
 
@@ -70,7 +71,7 @@ plink --bfile ${out_dir}/tmp_gwas_no_AT_CG \
    --make-bed --out ${out_dir}/pre_qc
 
 #Create vcf files for uploading to imputation server for QC
-#Note that the encoding for chromosome is e.g. chr22, not chr
+#Note that the encoding for chromosome is e.g. chr22, not 22
 for ((chr=1; chr<=22; chr++)); do
     plink --bfile ${out_dir}/pre_qc \
        --chr $chr --keep-allele-order \

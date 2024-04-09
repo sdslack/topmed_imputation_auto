@@ -7,8 +7,7 @@ then
     echo "Script uses output from TOPMed pre-imputation QC to fix strand"
     echo "flips. If "chr" input = "all", then the script will create one"
     echo "VCF file per chr. Otherwise, must be a single chr number '1',"
-    echo "'2', etc. Crossover is from hg19 to hg38, this script should"
-    echo "follow create_initial_input with crossover."
+    echo "'2', etc. This script should follow create_initial_input_no_crossover."
     exit
 fi
 
@@ -22,7 +21,6 @@ chr=$4
 Rscript --vanilla ${code_dir}/get_strand_flip_snp_names.R $pre_qc_dir $post_qc_dir
 
 #Create vcf files for uploading to imputation server for QC
-#Note that the encoding for chromosome is e.g. chr22, not 22
 # If chr = "all", then create one VCF file per chr, otherwise
 # chr must equal one chr number, so only make that VCF file
 if [ "$chr" == "all" ]
@@ -33,7 +31,6 @@ then
             --chr $chr --recode vcf \
             --out ${post_qc_dir}/tmp_chr${chr}
         vcf-sort ${post_qc_dir}/tmp_chr${chr}.vcf | \
-            sed -E 's/^([[:digit:]]+)/chr\1/' | \
             bgzip -c > ${post_qc_dir}/chr${chr}_post_qc.vcf.gz
     done
 else
@@ -42,7 +39,6 @@ else
             --chr $chr --recode vcf \
             --out ${post_qc_dir}/tmp_chr${chr}
         vcf-sort ${post_qc_dir}/tmp_chr${chr}.vcf | \
-            sed -E 's/^([[:digit:]]+)/chr\1/' | \
             bgzip -c > ${post_qc_dir}/chr${chr}_post_qc.vcf.gz
 fi
 
