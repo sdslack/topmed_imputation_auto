@@ -55,7 +55,6 @@ plink --bfile ${out_dir}/tmp_gwas_no_AT_CG \
       --make-bed --out ${out_dir}/pre_qc
 
 #Create vcf files for uploading to imputation server for QC
-#Note that the encoding for chromosome is e.g. chr22, not chr
 # If chr = "all", then create one VCF file per chr, otherwise
 # chr must equal one chr number, so only make that VCF file
 if [ "$chr" == "all" ]
