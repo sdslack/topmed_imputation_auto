@@ -114,6 +114,7 @@ then
             --chr $chr --keep-allele-order \
             --recode vcf --out ${out_dir}/tmp_chr${chr}
       vcf-sort ${out_dir}/tmp_chr${chr}.vcf | \
+            sed -E 's/^([[:digit:]]+)/chr\1/' | \
             bgzip -c > ${out_dir}/chr${chr}_pre_qc.vcf.gz
    fi
 # If chromosome 6 MHC region should have different HWE
