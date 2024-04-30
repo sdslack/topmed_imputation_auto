@@ -3,26 +3,32 @@
 #Set arguments
 if [ "$#" -eq  "0" ]
 then
-   echo "Usage: ${0##*/} <info.gz> <rsq> <maf>"
+   echo "Usage: ${0##*/} <chr> <rsq> <maf> <dir>"
    echo "Script filters new TOPMed INFO files formatted as VCFs."
    echo "Keeps TYPED or IMPUTED with Rsq less than given threshold,"
    echo "and filters MAF to given threshold."
+   echo "Script expects file formats: chr#.dose.vcf.gz & chr#.info.gz"
    exit
 fi
 
-info=$1
+chr=$1
 rsq=$2
 maf=$3
+dir=$4
 
-info_name=$(basename "$info")
-echo $info_name
-info_path=$(dirname "$info")
+# Set filter
+to_filt="((INFO/TYPED = 1 | (INFO/IMPUTED = 1 & INFO/R2 > ${rsq})) & INFO/MAF > ${maf})"
 
-# Filter INFO file
+# Filter INFO file, for smaller output with kept variables
+    # ((typed OR (imputed & R2)) & MAF)
 bcftools filter -i \
-    "((INFO/TYPED = 1 | (INFO/IMPUTED = 1 & INFO/R2 > ${rsq})) & INFO/MAF > ${maf})" \
-    "$info" -o "${info_path}/clean_${info_name}"
+    "$to_filt" \
+    "${dir}/chr${chr}.info.gz" -o "${dir}/${chr}_clean.info"
 
-# Write out list of IDs want to keep
-bcftools query -f '%ID\n' \
-    "${info_path}/clean_${info_name}" > "${info}_maf${maf}_rsq${rsq}_snps.txt"
+# Filter actual VCF
+    # To note: can't just do IDs because some appear more than once above & below
+    # filtering criteria
+bcftools filter -i \
+    "$to_filt" \
+    "${dir}/chr${chr}.dose.vcf.gz" -o "${dir}/${chr}_clean.vcf.gz"
+tabix "${dir}/${chr}_clean.vcf.gz"
