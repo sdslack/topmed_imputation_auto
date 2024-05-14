@@ -45,7 +45,6 @@ plink --bfile $plink_prefix \
    --keep-allele-order \
    --make-bed --out ${out_dir}/tmp_no_dupl
 
-
 # Create bed file to crossover from hg19 to hg38 
 cat ${out_dir}/tmp_no_dupl.bim | cut -f1 | sed 's/^/chr/' > ${out_dir}/tmp_c1.txt
 cat ${out_dir}/tmp_no_dupl.bim | cut -f4 > ${out_dir}/tmp_c2.txt
