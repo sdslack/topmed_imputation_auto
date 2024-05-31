@@ -125,26 +125,29 @@ else
       plink2 --pfile ${out_dir}/tmp_gwas_no_AT_CG_chrpos_ids \
       --maf 0.000001 --geno 0.05 --hwe 0.000001 \
       --not-chr 6 \
-      --make-bed --out ${out_dir}/pre_qc
+      --make-bed --out ${out_dir}/non_chr6_pre_qc
+
+      # Need to write out pre_qc with all chr for next pipeline step
+      plink --bfile ${out_dir}/non_chr6_pre_qc \
+         --bmerge ${out_dir}/chr6_pre_qc \
+         --keep-allele-order \
+         --make-bed --out ${out_dir}/pre_qc
 
       for ((chr_num=1; chr_num<=22; chr_num++)); do
-         if [ "$chr_num" != 6 ]; then
-            plink --bfile ${out_dir}/pre_qc \
-               --chr $chr_num --keep-allele-order \
-               --recode vcf --out ${out_dir}/tmp_chr${chr_num}
-            vcf-sort ${out_dir}/tmp_chr${chr_num}.vcf | \
-               bgzip -c > ${out_dir}/chr${chr_num}_pre_qc.vcf.gz
-         else
-            plink --bfile ${out_dir}/chr6_pre_qc \
-               --chr $chr_num --keep-allele-order \
-               --recode vcf --out ${out_dir}/tmp_chr${chr_num}
-            vcf-sort ${out_dir}/tmp_chr${chr_num}.vcf | \
-               bgzip -c > ${out_dir}/chr${chr_num}_pre_qc.vcf.gz
-         fi
+         plink --bfile ${out_dir}/pre_qc \
+            --chr $chr_num --keep-allele-order \
+            --recode vcf --out ${out_dir}/tmp_chr${chr_num}
+         vcf-sort ${out_dir}/tmp_chr${chr_num}.vcf | \
+            bgzip -c > ${out_dir}/chr${chr_num}_pre_qc.vcf.gz
+
       done
    # If preparing only chr6
    else
+      # Rename chr6 as pre_qc so recognized by next pipeline step
       plink --bfile ${out_dir}/chr6_pre_qc \
+         --chr $chr --keep-allele-order \
+         --make-bed --out ${out_dir}/pre_qc
+      plink --bfile ${out_dir}/pre_qc \
          --chr $chr --keep-allele-order \
          --recode vcf --out ${out_dir}/tmp_chr${chr}
       vcf-sort ${out_dir}/tmp_chr${chr}.vcf | \
@@ -179,7 +182,7 @@ else
    
    if [ "$chr" == "all" ]
    then
-      qc_snp_nr_non_chr6=`wc -l ${out_dir}/pre_qc.bim`
+      qc_snp_nr_non_chr6=`wc -l ${out_dir}/non_chr6_pre_qc.bim`
       echo "Final all other chr (non-chr6) SNP nr after QC: $qc_snp_nr_non_chr6"
       echo "Final all other chr (non-chr6) SNP nr after QC: $qc_snp_nr_non_chr6" >> \
          ${out_dir}/create_initial_input_log.txt
