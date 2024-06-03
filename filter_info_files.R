@@ -22,6 +22,9 @@ info_out_file <- paste0(info_file_dir, "/clean_", info_file_name)
 info <- read.delim(gzfile(info_file), stringsAsFactors=F)
 
 info$Rsq_num <- as.numeric(info$Rsq)
+print("Check that NA Rsq values are for Typed Only variants:")
+all(info$Genotyped[is.na(info$Rsq_num)] == "Typed_Only")
+
 # Select rows from info that are either genotyped or above the Rsq threshold
 # and also are above the MAF threshold
 info_clean <- info[
