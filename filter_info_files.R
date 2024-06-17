@@ -5,8 +5,8 @@
 
 args <- commandArgs(trailingOnly = TRUE)
 info_file <- args[1]
-rsq <- args[2]
-maf <- args[3]
+rsq <- as.numeric(args[2])
+maf <- as.numeric(args[3])
 
 print("First trailing arg should be input INFO file, second should be Rsq")
 print("filter, third should be MAF filter.")
