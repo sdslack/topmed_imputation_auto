@@ -40,11 +40,6 @@ get_strand_flip_snp_names <- function(pre_qc_dir, post_qc_dir) {
   # Get allele switch only snps
   snp.frame.as <- merge.to.excl[grep("Allele switch", merge.to.excl$FilterType),]
   
-  # Write out SNPs to be excluded using PLINK --exclude
-  # merge.to.excl <- merge.to.excl[,c("V2")]
-  # write.table(merge.to.excl, paste0(post_qc_dir, "/tmp_snps-excl.txt"), 
-  #             sep="\t", quote=F, row.names=F, col.names=F)
-  
   ### Handle strand flips & strand flip and allele switches
   # For both strand flip & strand flip and allele switch, flip strand
   # Only do if strand flips were found, otherwise create empty list
@@ -93,6 +88,3 @@ get_strand_flip_snp_names <- function(pre_qc_dir, post_qc_dir) {
 }
 
 get_strand_flip_snp_names(args[1], args[2])
-# pre_qc_dir <- "/Users/slacksa/Library/CloudStorage/OneDrive-TheUniversityofColoradoDenver/DAISY/genetics/daisy_ask_genetics/tm_r3_imp/pre_qc"
-# post_qc_dir <- "/Users/slacksa/Library/CloudStorage/OneDrive-TheUniversityofColoradoDenver/DAISY/genetics/daisy_ask_genetics/tm_r3_imp/post_qc"
-# get_strand_flip_snp_names(pre_qc_dir, post_qc_dir)
